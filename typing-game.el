@@ -43,6 +43,7 @@
 (defun typing-game/make-gui ()
   (switch-to-buffer (get-buffer-create typing-game-buffer))
   (typing-game-mode)
+  (read-only-mode)
   ;; (let ((height-delta (- typing-game-height (window-body-height)))
   ;;       (width-delta (- typing-game-width (window-body-width))))
   ;;   (window-resize nil width-delta nil t)
@@ -66,7 +67,8 @@
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (let ((case-fold-search nil)
+    (let ((inhibit-read-only t)
+          (case-fold-search nil)
           (query-replace-skip-read-only t)
           (this-command-keys (this-command-keys)))
       (goto-char (point-min))
