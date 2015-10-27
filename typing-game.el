@@ -6,7 +6,7 @@
   "打字游戏界面的列数")
 (defcustom typing-game-letters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
   "字母候选列表")
-(defcustom letter-number-one-row 2
+(defcustom letter-number-per-row 2
   "每行产生的新字母数")
 
 (defun typing-game//random-letter ()
@@ -16,7 +16,7 @@
 (defun typing-game//generate-letters ()
   "返回新产生的字幕"
   (let ((str (make-string typing-game-width ?\ )))
-    (dotimes (var letter-number-one-row)
+    (dotimes (var letter-number-per-row)
       (setf (elt str (random typing-game-width)) (typing-game//random-letter)))
     str))
 
@@ -51,12 +51,12 @@
   ;; (setq window-size-fixed t)
   )
 (defun typing-game/start-game-at-speed (speed)
-  ""
+  "start the typing game. `speed' determied how fast the letters failing. "
   (interactive "P")
   (setq speed (or speed 1))
   (typing-game/make-gui)
   (typing-game/stop-game)
-  (setq typing-game-timer (run-with-timer (/ 1.0 speed) (/ 5 speed) #'typing-game/down (current-buffer))))
+  (setq typing-game-timer (run-with-timer 0 (/ 5 speed) #'typing-game/down (current-buffer))))
 
 (defun typing-game/stop-game ()
   (interactive)
