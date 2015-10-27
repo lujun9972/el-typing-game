@@ -6,22 +6,22 @@
   "打字游戏界面的列数")
 (defcustom typing-game-letters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
   "字母候选列表")
-(defcustom letter-number-on-row 2
+(defcustom letter-number-one-row 2
   "每行产生的新字母数")
 
 (defun typing-game//random-letter ()
-  ""
+  "产生随机字母"
   (elt typing-game-letters (random (length typing-game-letters))))
 
 (defun typing-game//generate-letters ()
-  "返回新产生的字母"
+  "返回新产生的字幕"
   (let ((str (make-string typing-game-width ?\ )))
-    (dotimes (var letter-number-on-row)
+    (dotimes (var letter-number-one-row)
       (setf (elt str (random typing-game-width)) (typing-game//random-letter)))
     str))
 
 (defun typing-game/down (buffer)
-  "字符下滚一行"
+  "字幕下滚一行"
   (with-current-buffer buffer
     (save-excursion
       (let ((inhibit-read-only t))
