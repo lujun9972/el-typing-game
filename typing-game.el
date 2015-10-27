@@ -40,17 +40,20 @@
 (defcustom typing-game-buffer "*typing-game*"
   "buffer name of typing-game")
 
-(defun typing-game/start-game-at-speed (speed)
-  ""
-  (interactive "P")
-  (setq speed (or speed 1))
+(defun typing-game/make-gui ()
   (switch-to-buffer (get-buffer-create typing-game-buffer))
-  ;; (typing-game-mode 1)
+  (typing-game-mode)
   ;; (let ((height-delta (- typing-game-height (window-body-height)))
   ;;       (width-delta (- typing-game-width (window-body-width))))
   ;;   (window-resize nil width-delta nil t)
   ;;   (window-resize nil height-delta t t))
   ;; (setq window-size-fixed t)
+  )
+(defun typing-game/start-game-at-speed (speed)
+  ""
+  (interactive "P")
+  (setq speed (or speed 1))
+  (typing-game/make-gui)
   (typing-game/stop-game)
   (setq typing-game-timer (run-with-timer (/ 1.0 speed) (/ 5 speed) #'typing-game/down (current-buffer))))
 
