@@ -6,12 +6,15 @@
   "打字游戏界面的列数")
 (defcustom typing-game-letters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
   "字母候选列表")
-(defcustom letter-number-per-row 2
+(defcustom typing-game-letter-number-per-row 2
   "每行产生的新字母数")
-(defcustom scores-per-escaped-letter 10
+(defvar typing-game-total-scores 0)
+(defcustom typing-game-scores-per-escaped-letter 10
   "how many scores will be reduced when one letter escaped")
-(defcustom scores-per-erased-letter 1
+(defcustom typing-game-scores-per-erased-letter 1
   "how many scores will be increased when one letter erased ")
+(defcustom typing-game-escaped-letters ""
+  "letters that escaped in the game")
 
 (defun typing-game//random-letter ()
   "产生随机字母"
@@ -20,7 +23,7 @@
 (defun typing-game//generate-letters ()
   "返回新产生的字幕"
   (let ((str (make-string typing-game-width ?\ )))
-    (dotimes (var letter-number-per-row)
+    (dotimes (var typing-game-letter-number-per-row)
       (setf (elt str (random typing-game-width)) (typing-game//random-letter)))
     str))
 
@@ -37,6 +40,10 @@
         (forward-line (- typing-game-height 1))
         (end-of-line)
         ;; 删除后面的内容
+        (let* ((escaped-letters (replace-regexp-in-string "[ \r\n]" "" (buffer-substring-no-properties (point) (point-max))))
+               (escaped-letter-number (length escaped-letters)))
+          (setq typing-game-escaped-letters (concat escaped-letters typing-game-escaped-letters))
+          (setq typing-game-total-scores (- typing-game-total-scores (* typing-game-scores-per-escaped-letter escaped-letter-number))))
         (delete-region (point) (point-max))))))
 
 (defun typing-game/erase ()
@@ -49,6 +56,7 @@
           (this-command-keys (this-command-keys)))
       (goto-char (point-min))
       (while (search-forward this-command-keys nil t)
+        (setq typing-game-total-scores (+ typing-game-total-scores  typing-game-scores-per-erased-letter ))
         (replace-match " " nil t)))))
 
 
