@@ -2,7 +2,7 @@
   "打字游戏")
 (defcustom typing-game-letters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
   "字母候选列表")
-(defcustom typing-game-letter-number-per-row 2
+(defcustom typing-game-letters-per-row 2
   "每行产生的新字母数")
 (defvar typing-game-total-scores 0)
 (defcustom typing-game-scores-per-escaped-letter 10
@@ -20,7 +20,7 @@
   "返回新产生的字幕"
   (let* ((typing-game-width (window-body-width))
          (str (make-string typing-game-width ?\ )))
-    (dotimes (var typing-game-letter-number-per-row)
+    (dotimes (var typing-game-letters-per-row)
       (setf (elt str (random typing-game-width)) (typing-game//random-letter)))
     str))
 
