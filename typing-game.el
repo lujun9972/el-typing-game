@@ -1,9 +1,5 @@
 (defgroup typing-game nil
   "打字游戏")
-(defcustom typing-game-height 10
-  "打字游戏界面的行数")
-(defcustom typing-game-width 10
-  "打字游戏界面的列数")
 (defcustom typing-game-letters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
   "字母候选列表")
 (defcustom typing-game-letter-number-per-row 2
@@ -22,7 +18,8 @@
 
 (defun typing-game//generate-letters ()
   "返回新产生的字幕"
-  (let ((str (make-string typing-game-width ?\ )))
+  (let* ((typing-game-width (window-body-width))
+         (str (make-string typing-game-width ?\ )))
     (dotimes (var typing-game-letter-number-per-row)
       (setf (elt str (random typing-game-width)) (typing-game//random-letter)))
     str))
@@ -31,7 +28,8 @@
   "字幕下滚一行"
   (with-current-buffer buffer
     (save-excursion
-      (let ((inhibit-read-only t))
+      (let ((inhibit-read-only t)
+            (typing-game-height (window-body-height)))
         (goto-char (point-min))
         (insert (typing-game//generate-letters))
         (newline)
@@ -73,19 +71,15 @@
   (switch-to-buffer (get-buffer-create typing-game-buffer))
   (typing-game-mode)
   (read-only-mode)
-  ;; (let ((height-delta (- typing-game-height (window-body-height)))
-  ;;       (width-delta (- typing-game-width (window-body-width))))
-  ;;   (window-resize nil width-delta nil t)
-  ;;   (window-resize nil height-delta t t))
-  ;; (setq window-size-fixed t)
-  )
+  (setq window-size-fixed t))
+
 (defun typing-game/start-game-at-speed (speed)
   "start the typing game. `speed' determied how fast the letters failing. "
   (interactive "P")
-  (setq speed (or speed 1))
-  (typing-game/make-gui)
-  (typing-game/stop-game)
-  (setq typing-game-timer (run-with-timer 0 (/ 5 speed) #'typing-game/scroll-down (current-buffer))))
+  (let ((speed (or speed 1)))
+    (typing-game/make-gui)
+    (typing-game/stop-game)
+    (setq typing-game-timer (run-with-timer 0 (/ 5 speed) #'typing-game/scroll-down (current-buffer)))))
 
 (defun typing-game/stop-game ()
   (interactive)
