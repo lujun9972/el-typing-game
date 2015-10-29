@@ -1,9 +1,9 @@
 (defgroup typing-game nil
-  "打字游戏")
+  "typing game")
 (defcustom typing-game-letters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
   "字母候选列表")
 (defcustom typing-game-letters-per-row 2
-  "每行产生的新字母数")
+  "how many letters will be generated one row")
 (defvar typing-game-total-scores 0)
 (defcustom typing-game-scores-per-escaped-letter 10
   "how many scores will be reduced when one letter escaped")
@@ -13,7 +13,7 @@
   "letters that escaped in the game")
 
 (defun typing-game//random-letter ()
-  "产生随机字母"
+  "generate a random letter"
   (elt typing-game-letters (random (length typing-game-letters))))
 
 (defun typing-game//generate-letters ()
