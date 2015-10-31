@@ -81,6 +81,8 @@
 
 (defun typing-game/init-game ()
   (switch-to-buffer (get-buffer-create typing-game-buffer))
+  (let ((inhibit-read-only t))
+    (erase-buffer))
   (typing-game-mode)
   (read-only-mode)
   (setq window-size-fixed t)
