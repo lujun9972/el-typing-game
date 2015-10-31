@@ -27,22 +27,23 @@
 (defun typing-game/scroll-down (buffer)
   "字幕下滚一行"
   (with-current-buffer buffer
-    (save-excursion
-      (let ((inhibit-read-only t)
-            (typing-game-height (window-body-height)))
-        (goto-char (point-min))
-        (insert (typing-game//generate-letters typing-game-letters-per-row))
-        (newline)
-        ;; 跳转到第N行
-        (goto-char (point-min))
-        (forward-line (- typing-game-height 1))
-        (end-of-line)
-        ;; 删除后面的内容
-        (let* ((escaped-letters (replace-regexp-in-string "[ \r\n]" "" (buffer-substring-no-properties (point) (point-max))))
-               (escaped-letter-number (length escaped-letters)))
-          (setq typing-game-escaped-letters (concat escaped-letters typing-game-escaped-letters))
-          (setq typing-game-total-scores (- typing-game-total-scores (* typing-game-scores-per-escaped-letter escaped-letter-number))))
-        (delete-region (point) (point-max)))))
+    (when (eq major-mode 'typing-game-mode) ;这样光标离开游戏窗口后,便不再继续
+      (save-excursion
+        (let ((inhibit-read-only t)
+              (typing-game-height (window-body-height)))
+          (goto-char (point-min))
+          (insert (typing-game//generate-letters typing-game-letters-per-row))
+          (newline)
+          ;; 跳转到第N行
+          (goto-char (point-min))
+          (forward-line (- typing-game-height 1))
+          (end-of-line)
+          ;; 删除后面的内容
+          (let* ((escaped-letters (replace-regexp-in-string "[ \r\n]" "" (buffer-substring-no-properties (point) (point-max))))
+                 (escaped-letter-number (length escaped-letters)))
+            (setq typing-game-escaped-letters (concat escaped-letters typing-game-escaped-letters))
+            (setq typing-game-total-scores (- typing-game-total-scores (* typing-game-scores-per-escaped-letter escaped-letter-number))))
+          (delete-region (point) (point-max))))))
   (force-mode-line-update))
 
 (defun typing-game/erase ()
@@ -94,16 +95,19 @@
   (interactive "P")
   (let ((speed (or speed 3)))
     (typing-game/init-game)
-    (typing-game/stop-game 'DO-NOT-SHOW-RESULT)
+    (typing-game/cancel-game)
     (setq typing-game-timer (run-with-timer 0 (/ 5 speed) #'typing-game/scroll-down (current-buffer)))))
 
-(defun typing-game/stop-game (&optional not-show-result)
+(defun typing-game/cancel-game ()
   (interactive)
   (when (timerp  typing-game-timer)
     (cancel-timer typing-game-timer)
-    (setq typing-game-timer nil))
-  (unless not-show-result
-    (typing-game/show-result)))
+    (setq typing-game-timer nil)))
+
+(defun typing-game/stop-game ()
+  (interactive)
+  (typing-game/cancel-game)
+  (typing-game/show-result))
 
 (defun typing-game/show-result ()
   (let ((inhibit-read-only t))
