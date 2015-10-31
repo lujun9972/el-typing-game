@@ -61,22 +61,18 @@
 
 
 (defcustom typing-game-format
-  `("["
-    (:eval (prin1 typing-game-total-scores)) 
-    "]")
+  `((:eval (format "[%s]" typing-game-total-scores)))
   "format for displaying the total scores in the mode line"
   :group 'typing-game)
 
 (setq typing-game-format
-  `("["
-    (:eval "123") 
-    "]"))
+  `((:eval (format "[%s]" typing-game-total-scores))))
 
 (define-derived-mode typing-game-mode text-mode "typing-game"
   "Major mode for running typing-game"
   (local-set-key  [remap self-insert-command] 'typing-game/erase)
   (make-local-variable 'global-mode-string)
-  (setq global-mode-string (append global-mode-string '(typing-game-format))))
+  (setq global-mode-string (append global-mode-string `(,typing-game-format))))
 
 (defvar typing-game-timer nil)
 
