@@ -79,16 +79,19 @@
 (defcustom typing-game-buffer "*typing-game*"
   "buffer name of typing-game")
 
-(defun typing-game/make-gui ()
+(defun typing-game/init-game ()
   (switch-to-buffer (get-buffer-create typing-game-buffer))
   (typing-game-mode)
-  (read-only-mode))
+  (read-only-mode)
+  (setq window-size-fixed t)
+  (setq typing-game-total-scores 0)
+  (setq typing-game-escaped-letters ""))
 
 (defun typing-game/start-game-at-speed (speed)
   "start the typing game. `speed' determied how fast the letters failing. "
   (interactive "P")
-  (let ((speed (or speed 1)))
-    (typing-game/make-gui)
+  (let ((speed (or speed 3)))
+    (typing-game/init-game)
     (typing-game/stop-game 'DO-NOT-SHOW-RESULT)
     (setq typing-game-timer (run-with-timer 0 (/ 5 speed) #'typing-game/scroll-down (current-buffer)))))
 
@@ -110,3 +113,5 @@
       (newline)
       (insert "Those letters are escaped: \n" typing-game-escaped-letters)
       (newline))))
+
+(provide 'typing-game)
