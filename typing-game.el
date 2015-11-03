@@ -5,7 +5,7 @@
 (defcustom typing-game-letters-per-row 2
   "how many letters will be generated one row")
 (defvar typing-game-total-scores 0)
-(defcustom typing-game-scores-per-escaped-letter 10
+(defcustom typing-game-scores-per-escaped-letter -10
   "how many scores will be reduced when one letter escaped")
 (defcustom typing-game-scores-per-erased-letter 1
   "how many scores will be increased when one letter erased ")
@@ -23,6 +23,16 @@
     (dotimes (var letter-number)
       (setf (elt str (random typing-game-width)) (typing-game//random-letter)))
     str))
+
+(defun typing-game//change-scores (change)
+  "change and refresh the total scores"
+  (setq typing-game-total-scores (+ typing-game-total-scores change))
+  (force-mode-line-update))
+
+(defun typing-game//fix-screen ()
+  "In window mode, keep screen from jumping by keeping window started at the beginning of buffer"
+  (set-window-start (selected-window) (point-min))
+  (goto-char (point-min)))
 
 (defun typing-game/scroll-down (buffer)
   "字幕下滚一行"
@@ -42,9 +52,9 @@
           (let* ((escaped-letters (replace-regexp-in-string "[ \r\n]" "" (buffer-substring-no-properties (point) (point-max))))
                  (escaped-letter-number (length escaped-letters)))
             (setq typing-game-escaped-letters (concat escaped-letters typing-game-escaped-letters))
-            (setq typing-game-total-scores (- typing-game-total-scores (* typing-game-scores-per-escaped-letter escaped-letter-number))))
-          (delete-region (point) (point-max))))))
-  (force-mode-line-update))
+            (typing-game//change-scores (* typing-game-scores-per-escaped-letter escaped-letter-number)))
+          (delete-region (point) (point-max))))
+      (typing-game//fix-screen))))
 
 (defun typing-game/erase ()
   (interactive)
@@ -56,18 +66,16 @@
           (this-command-keys (this-command-keys)))
       (goto-char (point-min))
       (while (search-forward this-command-keys nil t)
-        (setq typing-game-total-scores (+ typing-game-total-scores  typing-game-scores-per-erased-letter ))
-        (replace-match " " nil t))
-      (force-mode-line-update))))
+        (typing-game//change-scores  typing-game-scores-per-erased-letter)
+        (replace-match " " nil t))))
+  (typing-game//fix-screen))
 
 
 (defcustom typing-game-format
-  `((:eval (format "[%s]" typing-game-total-scores)))
+  `((:eval (format "[SCORES:%s]" typing-game-total-scores)))
   "format for displaying the total scores in the mode line"
   :group 'typing-game)
 
-(setq typing-game-format
-  `((:eval (format "[%s]" typing-game-total-scores))))
 
 (define-derived-mode typing-game-mode text-mode "typing-game"
   "Major mode for running typing-game"
