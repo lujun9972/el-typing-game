@@ -93,7 +93,7 @@
     (erase-buffer))
   (typing-game-mode)
   (read-only-mode)
-  (setq window-size-fixed t)
+  ;; (setq window-size-fixed t)
   (setq typing-game-total-scores 0)
   (setq typing-game-escaped-letters ""))
 
