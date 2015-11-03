@@ -34,27 +34,29 @@
   (set-window-start (selected-window) (point-min))
   (goto-char (point-min)))
 
-(defun typing-game/scroll-down (buffer)
+(defun typing-game/scroll-down (&optional buffer)
   "字幕下滚一行"
-  (with-current-buffer buffer
-    (when (eq major-mode 'typing-game-mode) ;这样光标离开游戏窗口后,便不再继续
-      (save-excursion
-        (let ((inhibit-read-only t)
-              (typing-game-height (window-body-height)))
-          (goto-char (point-min))
-          (insert (typing-game//generate-letters typing-game-letters-per-row))
-          (newline)
-          ;; 跳转到第N行
-          (goto-char (point-min))
-          (forward-line (- typing-game-height 1))
-          (end-of-line)
-          ;; 删除后面的内容
-          (let* ((escaped-letters (replace-regexp-in-string "[ \r\n]" "" (buffer-substring-no-properties (point) (point-max))))
-                 (escaped-letter-number (length escaped-letters)))
-            (setq typing-game-escaped-letters (concat escaped-letters typing-game-escaped-letters))
-            (typing-game//change-scores (* typing-game-scores-per-escaped-letter escaped-letter-number)))
-          (delete-region (point) (point-max))))
-      (typing-game//fix-screen))))
+  (let ((buffer (or buffer
+                    (current-buffer))))
+    (with-current-buffer buffer
+      (when (eq major-mode 'typing-game-mode) ;这样光标离开游戏窗口后,便不再继续
+        (save-excursion
+          (let ((inhibit-read-only t)
+                (typing-game-height (window-body-height)))
+            (goto-char (point-min))
+            (insert (typing-game//generate-letters typing-game-letters-per-row))
+            (newline)
+            ;; 跳转到第N行
+            (goto-char (point-min))
+            (forward-line (- typing-game-height 1))
+            (end-of-line)
+            ;; 删除后面的内容
+            (let* ((escaped-letters (replace-regexp-in-string "[ \r\n]" "" (buffer-substring-no-properties (point) (point-max))))
+                   (escaped-letter-number (length escaped-letters)))
+              (setq typing-game-escaped-letters (concat escaped-letters typing-game-escaped-letters))
+              (typing-game//change-scores (* typing-game-scores-per-escaped-letter escaped-letter-number)))
+            (delete-region (point) (point-max))))
+        (typing-game//fix-screen)))))
 
 (defun typing-game/erase ()
   (interactive)
@@ -104,7 +106,7 @@
   (let ((speed (or speed 3)))
     (typing-game/init-game)
     (typing-game/cancel-game)
-    (setq typing-game-timer (run-with-timer 0 (/ 5 speed) #'typing-game/scroll-down (current-buffer)))))
+    (setq typing-game-timer (run-with-timer 0 (/ 5 speed) #'typing-game/scroll-down ))))
 
 (defun typing-game/cancel-game ()
   (interactive)
