@@ -7,9 +7,6 @@
 * What is typing-game
 It's a simple typing game in Emacs. You can customzie which characters to practice, how fast the characters failing and something else.
 
-* How to install
-just put the `typing-game.el' in the path of `LOAD-PATH'
-
 * How to play
 1. require the file
    #+BEGIN_SRC emacs-lisp
