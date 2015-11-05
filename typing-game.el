@@ -1,27 +1,29 @@
 (defgroup typing-game nil
   "typing game")
-(defcustom typing-game-letters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+(defcustom typing-game-characters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
   "字母候选列表")
-(defcustom typing-game-letters-per-row 2
-  "how many letters will be generated one row")
+(defcustom typing-game-characters-per-row 2
+  "how many characters will be generated one row")
 (defvar typing-game-total-scores 0)
-(defcustom typing-game-scores-per-escaped-letter -10
-  "how many scores will be reduced when one letter escaped")
-(defcustom typing-game-scores-per-erased-letter 1
-  "how many scores will be increased when one letter erased ")
-(defcustom typing-game-escaped-letters ""
-  "letters that escaped in the game")
+(defcustom typing-game-scores-per-escaped-character -10
+  "how many scores will be reduced when one character escaped")
+(defcustom typing-game-scores-per-erased-character 1
+  "how many scores will be increased when one character erased ")
+(defcustom typing-game-default-level 3
+  "the default level of typing game")
+(defvar typing-game-escaped-characters ""
+  "characters that escaped in the game")
 
-(defun typing-game//random-letter ()
-  "generate a random letter"
-  (elt typing-game-letters (random (length typing-game-letters))))
+(defun typing-game//random-character ()
+  "generate a random character"
+  (elt typing-game-characters (random (length typing-game-characters))))
 
-(defun typing-game//generate-letters (letter-number)
+(defun typing-game//generate-characters (character-number)
   "返回新产生的字幕"
   (let* ((typing-game-width (window-body-width))
          (str (make-string typing-game-width ?\ )))
-    (dotimes (var letter-number)
-      (setf (elt str (random typing-game-width)) (typing-game//random-letter)))
+    (dotimes (var character-number)
+      (setf (elt str (random typing-game-width)) (typing-game//random-character)))
     str))
 
 (defun typing-game//change-scores (change)
@@ -41,17 +43,17 @@
       (let ((inhibit-read-only t)
             (typing-game-height (window-body-height)))
         (goto-char (point-min))
-        (insert (typing-game//generate-letters typing-game-letters-per-row))
+        (insert (typing-game//generate-characters typing-game-characters-per-row))
         (newline)
         ;; 跳转到第N行
         (goto-char (point-min))
         (forward-line (- typing-game-height 1))
         (end-of-line)
         ;; 删除后面的内容
-        (let* ((escaped-letters (replace-regexp-in-string "[ \r\n]" "" (buffer-substring-no-properties (point) (point-max))))
-               (escaped-letter-number (length escaped-letters)))
-          (setq typing-game-escaped-letters (concat escaped-letters typing-game-escaped-letters))
-          (typing-game//change-scores (* typing-game-scores-per-escaped-letter escaped-letter-number)))
+        (let* ((escaped-characters (replace-regexp-in-string "[ \r\n]" "" (buffer-substring-no-properties (point) (point-max))))
+               (escaped-character-number (length escaped-characters)))
+          (setq typing-game-escaped-characters (concat escaped-characters typing-game-escaped-characters))
+          (typing-game//change-scores (* typing-game-scores-per-escaped-character escaped-character-number)))
         (delete-region (point) (point-max))))
     (typing-game//fix-screen)))
 
@@ -65,7 +67,7 @@
           (this-command-keys (this-command-keys)))
       (goto-char (point-min))
       (while (search-forward this-command-keys nil t)
-        (typing-game//change-scores  typing-game-scores-per-erased-letter)
+        (typing-game//change-scores  typing-game-scores-per-erased-character)
         (replace-match " " nil t))))
   (typing-game//fix-screen))
 
@@ -95,12 +97,12 @@
   (read-only-mode)
   ;; (setq window-size-fixed t)
   (setq typing-game-total-scores 0)
-  (setq typing-game-escaped-letters ""))
+  (setq typing-game-escaped-characters ""))
 
 (defun typing-game/start-game-at-speed (speed)
-  "start the typing game. `speed' determied how fast the letters failing. "
+  "start the typing game. `speed' determied how fast the characters failing. "
   (interactive "P")
-  (let ((speed (or speed 3)))
+  (let ((speed (or speed typing-game-default-level)))
     (typing-game/init-game)
     (typing-game/cancel-game)
     (setq typing-game-timer (run-with-timer 0 (/ 5 speed) #'typing-game/scroll-down ))))
@@ -124,7 +126,7 @@
       (newline)
       (insert (format "Total Scores: %d"  typing-game-total-scores))
       (newline)
-      (insert "Those letters are escaped: \n" typing-game-escaped-letters)
+      (insert "Those characters are escaped: \n" typing-game-escaped-characters)
       (newline))))
 
 (provide 'typing-game)
