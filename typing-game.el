@@ -11,6 +11,9 @@
   "how many scores will be increased when one character erased ")
 (defcustom typing-game-default-level 3
   "the default level of typing game")
+(defcustom typing-game-buffer "*typing-game*"
+  "buffer name of typing-game")
+
 (defvar typing-game-escaped-characters ""
   "characters that escaped in the game")
 
@@ -84,10 +87,8 @@
   (make-local-variable 'global-mode-string)
   (setq global-mode-string (append global-mode-string `(,typing-game-format))))
 
-(defvar typing-game-timer nil)
-
-(defcustom typing-game-buffer "*typing-game*"
-  "buffer name of typing-game")
+(defvar typing-game-start-time (float-time)
+  "when this game started")
 
 (defun typing-game/init-game ()
   (switch-to-buffer (get-buffer-create typing-game-buffer))
@@ -97,7 +98,10 @@
   (read-only-mode)
   ;; (setq window-size-fixed t)
   (setq typing-game-total-scores 0)
-  (setq typing-game-escaped-characters ""))
+  (setq typing-game-escaped-characters "")
+  (setq typing-game-start-time (float-time)))
+
+(defvar typing-game-timer nil)
 
 (defun typing-game/start-game-at-speed (speed)
   "start the typing game. `speed' determied how fast the characters failing. "
@@ -125,6 +129,8 @@
       (insert (user-login-name) ":")
       (newline)
       (insert (format "Total Scores: %d"  typing-game-total-scores))
+      (newline)
+      (insert (format "Escaped time (seconds): %d"  (- (float-time) typing-game-start-time)))
       (newline)
       (insert "Those characters are escaped: \n" typing-game-escaped-characters)
       (newline))))
