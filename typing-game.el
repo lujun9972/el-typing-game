@@ -1,7 +1,7 @@
 (defgroup typing-game nil
   "typing game")
 (defcustom typing-game-characters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-  "字母候选列表")
+  "characters to be practice")
 (defcustom typing-game-characters-per-row 2
   "how many characters will be generated one row")
 (defvar typing-game-total-scores 0)
