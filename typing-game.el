@@ -3,6 +3,8 @@
 ;; Copyright (C) 2004-2015 Free Software Foundation, Inc.
 
 ;; Author: DarkSun <lujun9972@gmail.com>
+;; Created: 2015-11-03
+;; Version: 0.1
 ;; Keywords: lisp, game 
 
 ;; This file is NOT part of GNU Emacs.
