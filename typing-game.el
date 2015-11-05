@@ -141,6 +141,7 @@
 
 (defvar typing-game-timer nil)
 
+;;;###autoload
 (defun typing-game/start-game-at-speed (speed)
   "start the typing game. `speed' determied how fast the characters failing. "
   (interactive "P")
