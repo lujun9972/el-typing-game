@@ -1,0 +1,50 @@
+#+TITLE: README
+#+AUTHOR: DarkSun
+#+CATEGORY: el-typing-game
+#+DATE: [2015-11-05 周四 10:31]
+#+OPTIONS: ^:{}
+
+* What is typing-game
+It's a simple typing game in Emacs. You can customzie which characters to practice, how fast the characters failing and something else.
+
+* How to install
+just put the `typing-game.el' in the path of `LOAD-PATH'
+
+* How to play
+1. require the file
+   #+BEGIN_SRC emacs-lisp
+     (require 'typing-game)
+   #+END_SRC
+
+2. play the game
+   ~M-x typing-game/start-game-at-speed~
+   
+   Also,you can use prefix argument to specify the game-level. The higher level means higher failing speed. 
+   
+   The default game-level is 3 which is specified by the variable `typing-game-default-level'
+
+3. stop the game and show the result
+   ~M-x typing-game/stop-game~
+   
+   It will stop the game and show how long you have played, how many socres you have got and which characters you have missed.
+
+* Customize
+~M-x customze-group <RET> typing-game <RET>~
+
+** typing-game-characters
+use this variable to customzie the characters to be practice
+
+** typing-game-default-level
+the default level of typing game
+
+** typing-game-characters-per-row
+how many characters will be generated one row
+
+** typing-game-scores-per-escaped-character
+how many scores will be reduced when one character escaped
+
+** typing-game-scores-per-erased-character
+how many scores will be increased when one character erased 
+
+** typing-game-buffer
+specify the buffer name of typing-game
