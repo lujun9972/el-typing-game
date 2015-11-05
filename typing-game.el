@@ -32,7 +32,10 @@
 ;;; Code:
 
 (defgroup typing-game nil
-  "typing game")
+  "a typing game in Emacs"
+  :version "24.4"
+  :group 'typing-game)
+
 (defcustom typing-game-characters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
   "characters to be practice")
 (defcustom typing-game-characters-per-row 2
