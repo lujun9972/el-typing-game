@@ -9,11 +9,13 @@ It's a simple typing game in Emacs. You can customzie which characters to practi
 
 * How to play
 1. require the file
+
    #+BEGIN_SRC emacs-lisp
      (require 'typing-game)
    #+END_SRC
 
 2. play the game
+
    ~M-x typing-game/start-game-at-speed~
    
    Also,you can use prefix argument to specify the game-level. The higher level means higher failing speed. 
@@ -21,6 +23,7 @@ It's a simple typing game in Emacs. You can customzie which characters to practi
    The default game-level is 3 which is specified by the variable `typing-game-default-level'
 
 3. stop the game and show the result
+
    ~M-x typing-game/stop-game~
    
    It will stop the game and show how long you have played, how many socres you have got and which characters you have missed.
