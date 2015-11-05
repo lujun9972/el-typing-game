@@ -29,7 +29,8 @@
 
 ;; typing-game is a simple typing game in Emacs. You can customzie which characters to practice, how fast the characters failing and something else.
 
-;;
+;;; Code:
+
 (defgroup typing-game nil
   "typing game")
 (defcustom typing-game-characters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -168,3 +169,5 @@
       (newline))))
 
 (provide 'typing-game)
+
+;;; typing-game.el ends here
