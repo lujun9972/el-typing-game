@@ -1,11 +1,11 @@
-;;; typing-game.el --- a simple typing game in Emacs
+;;; typing-game.el --- a simple typing game
 
 ;; Copyright (C) 2004-2015 Free Software Foundation, Inc.
 
 ;; Author: DarkSun <lujun9972@gmail.com>
 ;; Created: 2015-11-03
 ;; Version: 0.1
-;; Keywords: lisp, game 
+;; Keywords: lisp, game
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -29,62 +29,70 @@
 
 ;;; Commentary:
 
-;; typing-game is a simple typing game in Emacs. You can customzie which characters to practice, how fast the characters failing and something else.
+;; typing-game is a simple typing game in Emacs. You can customize
+;; which characters to practice, how fast the characters failing and
+;; something else.
 
 ;;; Code:
 
 (defgroup typing-game nil
   "a typing game in Emacs"
-  :version "24.4"
-  :group 'typing-game)
+  :prefix "typing-game-"
+  :group 'games)
 
 (defcustom typing-game-characters "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-  "characters to be practice")
+  "Characters to be practiced."
+  :group 'typing-game)
 (defcustom typing-game-characters-per-row 2
-  "how many characters will be generated one row")
+  "How many characters will be generated one row."
+  :group 'typing-game)
 (defvar typing-game-total-scores 0)
 (defcustom typing-game-scores-per-escaped-character -10
-  "how many scores will be reduced when one character escaped")
+  "Score penalty for each character which escaped."
+  :group 'typing-game)
 (defcustom typing-game-scores-per-erased-character 1
-  "how many scores will be increased when one character erased ")
+  "Score per character erased."
+  :group 'typing-game)
 (defcustom typing-game-default-level 3
-  "the default level of typing game")
+  "The default level for `typing-game'."
+  :group 'typing-game)
 (defcustom typing-game-buffer "*typing-game*"
-  "buffer name of typing-game")
+  "Buffer name for `typing-game'."
+  :group 'typing-game)
 
 (defvar typing-game-escaped-characters ""
   "characters that escaped in the game")
 
-(defun typing-game//random-character ()
+(defun typing-game--random-character ()
   "generate a random character"
   (elt typing-game-characters (random (length typing-game-characters))))
 
-(defun typing-game//generate-characters (character-number)
+(defun typing-game--generate-characters (character-number)
   "返回新产生的字幕"
   (let* ((typing-game-width (window-body-width))
          (str (make-string typing-game-width ?\ )))
     (dotimes (var character-number)
-      (setf (elt str (random typing-game-width)) (typing-game//random-character)))
+      (setf (elt str (random typing-game-width)) (typing-game--random-character)))
     str))
 
-(defun typing-game//change-scores (change)
+(defun typing-game--change-scores (change)
   "change and refresh the total scores"
   (setq typing-game-total-scores (+ typing-game-total-scores change))
   (force-mode-line-update))
 
-(defun typing-game//fix-screen ()
+(defun typing-game--fix-screen ()
   "In window mode, keep screen from jumping by keeping window started at the beginning of buffer"
   (set-window-start (selected-window) (point-min))
   (goto-char (point-min)))
 
-(defun typing-game/scroll-down ()
+(defun typing-game-scroll-down ()
   "字幕下滚一行"
   (when (eq major-mode 'typing-game-mode) ;这样光标离开游戏窗口后,便不再继续
     (save-excursion
       (let ((inhibit-read-only t)
             (typing-game-height (window-body-height)))
         (goto-char (point-min))
-        (insert (typing-game//generate-characters typing-game-characters-per-row))
+        (insert (typing-game--generate-characters typing-game-characters-per-row))
         (newline)
         ;; 跳转到第N行
         (goto-char (point-min))
@@ -94,41 +102,48 @@
         (let* ((escaped-characters (replace-regexp-in-string "[ \r\n]" "" (buffer-substring-no-properties (point) (point-max))))
                (escaped-character-number (length escaped-characters)))
           (setq typing-game-escaped-characters (concat escaped-characters typing-game-escaped-characters))
-          (typing-game//change-scores (* typing-game-scores-per-escaped-character escaped-character-number)))
+          (typing-game--change-scores (* typing-game-scores-per-escaped-character escaped-character-number)))
         (delete-region (point) (point-max))))
-    (typing-game//fix-screen)))
+    (typing-game--fix-screen)))
 
-(defun typing-game/erase ()
+(defun typing-game-erase ()
   (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (let ((inhibit-read-only t)
-          (case-fold-search nil)
-          (query-replace-skip-read-only t)
-          (this-command-keys (this-command-keys)))
+  (when (typing-game-running-p)
+    (save-excursion
       (goto-char (point-min))
-      (while (search-forward this-command-keys nil t)
-        (typing-game//change-scores  typing-game-scores-per-erased-character)
-        (replace-match " " nil t))))
-  (typing-game//fix-screen))
+      (let ((inhibit-read-only t)
+            (case-fold-search nil)
+            (query-replace-skip-read-only t)
+            (this-command-keys (this-command-keys)))
+        (goto-char (point-min))
+        (while (search-forward this-command-keys nil t)
+          (typing-game--change-scores  typing-game-scores-per-erased-character)
+          (replace-match " " nil t))))
+    (typing-game--fix-screen)))
 
 
 (defcustom typing-game-format
-  `((:eval (format "[SCORES:%s]" typing-game-total-scores)))
-  "format for displaying the total scores in the mode line"
+  `((:eval (format "[SCORE: %d]" typing-game-total-scores)))
+  "Format for displaying the total scores in the mode line."
   :group 'typing-game)
 
 
 (define-derived-mode typing-game-mode text-mode "typing-game"
   "Major mode for running typing-game"
-  (local-set-key  [remap self-insert-command] 'typing-game/erase)
+  (local-set-key  [remap self-insert-command] 'typing-game-erase)
+  (setq show-trailing-whitespace nil)
   (make-local-variable 'global-mode-string)
   (setq global-mode-string (append global-mode-string `(,typing-game-format))))
+
+(define-key typing-game-mode-map (kbd "C-c C-c") 'typing-game-stop-game)
 
 (defvar typing-game-start-time (float-time)
   "when this game started")
 
-(defun typing-game/init-game ()
+(defun typing-game-running-p ()
+  (timerp typing-game-timer))
+
+(defun typing-game-init-game ()
   (switch-to-buffer (get-buffer-create typing-game-buffer))
   (let ((inhibit-read-only t))
     (erase-buffer))
@@ -142,36 +157,37 @@
 (defvar typing-game-timer nil)
 
 ;;;###autoload
-(defun typing-game/start-game-at-speed (speed)
-  "start the typing game. `speed' determied how fast the characters failing. "
+(defun typing-game (speed)
+  "Start the typing game.
+`SPEED' determines how fast the characters fall."
   (interactive "P")
   (let ((speed (or speed typing-game-default-level)))
-    (typing-game/init-game)
-    (typing-game/cancel-game)
-    (setq typing-game-timer (run-with-timer 0 (/ 5 speed) #'typing-game/scroll-down ))))
+    (typing-game-init-game)
+    (typing-game-cancel-game)
+    (setq typing-game-timer (run-with-timer 0 (/ 5 speed) #'typing-game-scroll-down))))
 
-(defun typing-game/cancel-game ()
+(defun typing-game-cancel-game ()
   (interactive)
-  (when (timerp  typing-game-timer)
+  (when (timerp typing-game-timer)
     (cancel-timer typing-game-timer)
     (setq typing-game-timer nil)))
 
-(defun typing-game/stop-game ()
+(defun typing-game-stop-game ()
   (interactive)
-  (typing-game/cancel-game)
-  (typing-game/show-result))
+  (typing-game-cancel-game)
+  (typing-game-show-result))
 
-(defun typing-game/show-result ()
+(defun typing-game-show-result ()
   (let ((inhibit-read-only t))
     (with-current-buffer (get-buffer-create typing-game-buffer)
       (erase-buffer)
       (insert (user-login-name) ":")
       (newline)
-      (insert (format "Total Scores: %d"  typing-game-total-scores))
+      (insert (format "Total score:            %d"  typing-game-total-scores))
       (newline)
-      (insert (format "Escaped time (seconds): %d"  (- (float-time) typing-game-start-time)))
+      (insert (format "Elapsed time (seconds): %d"  (- (float-time) typing-game-start-time)))
       (newline)
-      (insert "Those characters are escaped: \n" typing-game-escaped-characters)
+      (insert "Characters which escaped:\n" typing-game-escaped-characters)
       (newline))))
 
 (provide 'typing-game)
