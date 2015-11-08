@@ -16,7 +16,7 @@ It's a simple typing game in Emacs. You can customzie which characters to practi
 
 2. play the game
 
-   ~M-x typing-game/start-game-at-speed~
+   ~M-x typing-game-start-game-at-speed~
    
    Also,you can use prefix argument to specify the game-level. The higher level means higher failing speed. 
    
@@ -24,7 +24,7 @@ It's a simple typing game in Emacs. You can customzie which characters to practi
 
 3. stop the game and show the result
 
-   ~M-x typing-game/stop-game~
+   ~M-x typing-game-stop-game~
    
    It will stop the game and show how long you have played, how many socres you have got and which characters you have missed.
 
@@ -32,19 +32,19 @@ It's a simple typing game in Emacs. You can customzie which characters to practi
 ~M-x customze-group <RET> typing-game <RET>~
 
 ** typing-game-characters
-use this variable to customzie the characters to be practice
+use this variable to customzie the characters to be practiced
 
 ** typing-game-default-level
-the default level of typing game
+the default level for typing game
 
 ** typing-game-characters-per-row
 how many characters will be generated one row
 
 ** typing-game-scores-per-escaped-character
-how many scores will be reduced when one character escaped
+Score penalty for each character which escaped
 
 ** typing-game-scores-per-erased-character
-how many scores will be increased when one character erased 
+Score per character erased.
 
 ** typing-game-buffer
-specify the buffer name of typing-game
+Buffer name for `typing-game'.
