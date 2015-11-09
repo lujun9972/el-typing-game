@@ -128,7 +128,7 @@
   :group 'typing-game)
 
 
-(define-derived-mode typing-game-mode text-mode "typing-game"
+(define-derived-mode typing-game-mode special-mode "typing-game"
   "Major mode for running typing-game"
   (local-set-key  [remap self-insert-command] 'typing-game-erase)
   (setq show-trailing-whitespace nil)
