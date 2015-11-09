@@ -140,6 +140,8 @@
 (defvar typing-game-start-time (float-time)
   "when this game started")
 
+(defvar typing-game-timer nil)
+
 (defun typing-game-running-p ()
   (timerp typing-game-timer))
 
@@ -153,8 +155,6 @@
   (setq typing-game-total-scores 0)
   (setq typing-game-escaped-characters "")
   (setq typing-game-start-time (float-time)))
-
-(defvar typing-game-timer nil)
 
 ;;;###autoload
 (defun typing-game (speed)
