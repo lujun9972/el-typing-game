@@ -128,7 +128,7 @@
   :group 'typing-game)
 
 
-(define-derived-mode typing-game-mode text-mode "typing-game"
+(define-derived-mode typing-game-mode special-mode "typing-game"
   "Major mode for running typing-game"
   (local-set-key  [remap self-insert-command] 'typing-game-erase)
   (setq show-trailing-whitespace nil)
@@ -139,6 +139,8 @@
 
 (defvar typing-game-start-time (float-time)
   "when this game started")
+
+(defvar typing-game-timer nil)
 
 (defun typing-game-running-p ()
   (timerp typing-game-timer))
@@ -153,8 +155,6 @@
   (setq typing-game-total-scores 0)
   (setq typing-game-escaped-characters "")
   (setq typing-game-start-time (float-time)))
-
-(defvar typing-game-timer nil)
 
 ;;;###autoload
 (defun typing-game (speed)
